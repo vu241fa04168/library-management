@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up | Vignan Portal{% endblock %}
+
+{% block content %}
+<div class="glass-card">
+    <h2 class="card-title">Create Account</h2>
+    <p class="card-subtitle">Get started with a free secure account today</p>
+    
+    <form method="post" action="{% url 'register' %}" novalidate id="register-form">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="errorlist">
+            {% for error in form.non_field_errors %}
+            <div>❌ {{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Username Field -->
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                required 
+                autocomplete="username" 
+                placeholder="Choose a username"
+                value="{{ form.username.value|default:'' }}"
+                aria-describedby="username-error"
+            >
+            <div id="username-error" class="error-msg">
+                ❌ Username is required. (Letters, digits and @/./+/-/_ only).
+            </div>
+            {% if form.username.errors %}
+            <div class="errorlist">
+                {% for error in form.username.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Email Field -->
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                required 
+                autocomplete="email" 
+                placeholder="you@example.com"
+                value="{{ form.email.value|default:'' }}"
+                aria-describedby="email-error"
+            >
+            <div id="email-error" class="error-msg">
+                ❌ Please enter a valid email address.
+            </div>
+            {% if form.email.errors %}
+            <div class="errorlist">
+                {% for error in form.email.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Password Field -->
+        <div class="form-group">
+            <label for="new-password">Password</label>
+            <!-- Rules list placed above the input for mobile keyboard safety -->
+            <ul id="password-rules" class="rules-list">
+                <li>Password must be at least 8 characters long.</li>
+                <li>It cannot be too similar to your username or email.</li>
+                <li>It cannot be a commonly used password.</li>
+            </ul>
+            <div class="password-input-wrapper">
+                <input 
+                    type="password" 
+                    id="new-password" 
+                    name="password1" 
+                    required 
+                    minlength="8"
+                    autocomplete="new-password" 
+                    placeholder="Create a strong password"
+                    aria-describedby="password-rules password-error"
+                >
+                <button type="button" class="password-toggle" id="password-toggle" aria-label="Show password">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="password-error" class="error-msg">
+                ❌ Password must be at least 8 characters.
+            </div>
+            {% if form.password1.errors %}
+            <div class="errorlist">
+                {% for error in form.password1.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Password Confirmation Field -->
+        <div class="form-group">
+            <label for="confirm-password">Confirm Password</label>
+            <div class="password-input-wrapper">
+                <input 
+                    type="password" 
+                    id="confirm-password" 
+                    name="password2" 
+                    required 
+                    autocomplete="new-password" 
+                    placeholder="Confirm your password"
+                    aria-describedby="confirm-password-error"
+                >
+                <button type="button" class="password-toggle" id="confirm-password-toggle" aria-label="Show password">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="confirm-password-error" class="error-msg">
+                ❌ Please confirm your password.
+            </div>
+            {% if form.password2.errors %}
+            <div class="errorlist">
+                {% for error in form.password2.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+            Create Account
+        </button>
+    </form>
+    
+    <div class="form-footer-link">
+        Already have an account? <a href="{% url 'login' %}">Sign in</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Password toggles interaction
+    const initPasswordToggle = (inputId, toggleId) => {
+        const input = document.getElementById(inputId);
+        const toggle = document.getElementById(toggleId);
+        
+        if (input && toggle) {
+            toggle.addEventListener('click', () => {
+                const isPassword = input.getAttribute('type') === 'password';
+                input.setAttribute('type', isPassword ? 'text' : 'password');
+                
+                if (isPassword) {
+                    toggle.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                            <line x1="1" y1="1" x2="23" y2="23"/>
+                        </svg>
+                    `;
+                    toggle.setAttribute('aria-label', 'Hide password');
+                } else {
+                    toggle.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    `;
+                    toggle.setAttribute('aria-label', 'Show password');
+                }
+            });
+        }
+    };
+    
+    initPasswordToggle('new-password', 'password-toggle');
+    initPasswordToggle('confirm-password', 'confirm-password-toggle');
+</script>
+{% endblock %}

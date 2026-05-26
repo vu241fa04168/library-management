@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In | Vignan Portal{% endblock %}
+
+{% block content %}
+<div class="glass-card">
+    <h2 class="card-title">Welcome Back</h2>
+    <p class="card-subtitle">Enter your credentials to access your secure portal</p>
+    
+    <form method="post" action="{% url 'login' %}" novalidate id="login-form">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="errorlist">
+            {% for error in form.non_field_errors %}
+            <div>❌ {{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Username Field -->
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                required 
+                autocomplete="username" 
+                placeholder="Enter your username"
+                value="{{ form.username.value|default:'' }}"
+                aria-describedby="username-error"
+            >
+            <div id="username-error" class="error-msg">
+                ❌ Please enter your username.
+            </div>
+            {% if form.username.errors %}
+            <div class="errorlist">
+                {% for error in form.username.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Password Field -->
+        <div class="form-group">
+            <label for="current-password">Password</label>
+            <div class="password-input-wrapper">
+                <input 
+                    type="password" 
+                    id="current-password" 
+                    name="password" 
+                    required 
+                    autocomplete="current-password" 
+                    placeholder="Enter your password"
+                    aria-describedby="password-error"
+                >
+                <button type="button" class="password-toggle" id="password-toggle" aria-label="Show password">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-icon">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="password-error" class="error-msg">
+                ❌ Password is required.
+            </div>
+            {% if form.password.errors %}
+            <div class="errorlist">
+                {% for error in form.password.errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+            Sign In
+        </button>
+    </form>
+    
+    <div class="form-footer-link">
+        Don't have an account? <a href="{% url 'register' %}">Get started</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Password toggle interaction
+    const passwordInput = document.getElementById('current-password');
+    const passwordToggle = document.getElementById('password-toggle');
+    
+    if (passwordToggle && passwordInput) {
+        passwordToggle.addEventListener('click', () => {
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            
+            // Adjust SVG representation dynamically
+            if (isPassword) {
+                passwordToggle.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                        <line x1="1" y1="1" x2="23" y2="23"/>
+                    </svg>
+                `;
+                passwordToggle.setAttribute('aria-label', 'Hide password');
+            } else {
+                passwordToggle.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                `;
+                passwordToggle.setAttribute('aria-label', 'Show password');
+            }
+        });
+    }
+</script>
+{% endblock %}
