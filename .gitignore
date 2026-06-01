@@ -1,0 +1,8 @@
+*.pyc
+__pycache__/
+db.sqlite3
+staticfiles/
+vignan-library.zip
+.env
+.idea/
+.vscode/
