@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Publisher Dashboard | Vignan Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .publisher-container {
+        width: 100%;
+        max-width: 1200px;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        border-bottom: 1px solid var(--card-border);
+        padding-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .page-title {
+        font-family: var(--font-display);
+        font-size: 2.25rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius-lg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        min-width: 700px;
+    }
+
+    th, td {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--card-border);
+    }
+
+    th {
+        font-family: var(--font-display);
+        color: var(--text-secondary);
+        font-weight: 600;
+        background: rgba(15, 23, 42, 0.5);
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    td {
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        vertical-align: middle;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    tr:hover {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .book-title-cell {
+        font-weight: 600;
+        color: #ffffff;
+    }
+
+    .book-author-cell {
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+    }
+
+    .badge-copies {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .badge-available {
+        background: var(--success-bg);
+        border: 1px solid var(--success-border);
+        color: #34d399;
+    }
+
+    .badge-total {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--card-border);
+        color: var(--text-secondary);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius-lg);
+        color: var(--text-secondary);
+        width: 100%;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="publisher-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Publisher Portal</h1>
+            <p style="color: var(--text-secondary); margin-top: 0.25rem;">Manage publications, track current inventory, and add new listings.</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+            <a href="{% url 'book_list' %}" class="btn btn-secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 0.25rem;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Student Portal
+            </a>
+            <a href="{% url 'publish_book' %}" class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 0.25rem;"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Publish New Book
+            </a>
+        </div>
+    </div>
+
+    {% if books %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Book Information</th>
+                        <th>ISBN</th>
+                        <th>Published Date</th>
+                        <th style="text-align: center;">Available Copies</th>
+                        <th style="text-align: center;">Total Inventory</th>
+                        <th style="text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books %}
+                        <tr>
+                            <td>
+                                <div class="book-title-cell">{{ book.title }}</div>
+                                <div class="book-author-cell">by {{ book.author }}</div>
+                            </td>
+                            <td><code style="color: #a5b4fc; font-family: monospace;">{{ book.isbn }}</code></td>
+                            <td>{{ book.published_date|date:"F d, Y" }}</td>
+                            <td style="text-align: center;">
+                                <span class="badge-copies badge-available">
+                                    {{ book.available_copies }}
+                                </span>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="badge-copies badge-total">
+                                    {{ book.total_copies }}
+                                </span>
+                            </td>
+                            <td style="text-align: center;">
+                                <form action="{% url 'unpublish_book' book.id %}" method="post" onsubmit="return confirm('Are you sure you want to unpublish &quot;{{ book.title }}&quot;?');" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn" style="background: #ef4444; color: white; padding: 0.4rem 0.8rem; font-size: 0.85rem; border-radius: var(--radius-sm); border: none; cursor: pointer; font-weight: 600; transition: var(--transition-smooth);">
+                                        Unpublish
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-muted); margin-bottom: 1rem;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+            <h3>No Publications Yet</h3>
+            <p style="margin-top: 0.5rem; color: var(--text-muted);">You have not published any books to the catalog yet. Click the button above to publish your first book!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

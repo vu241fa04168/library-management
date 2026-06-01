@@ -557,6 +557,17 @@
                 <ul class="nav-menu">
                     {% if user.is_authenticated %}
                     <li><a href="{% url 'home' %}" class="nav-link">Dashboard</a></li>
+                    <li><a href="{% url 'book_list' %}" class="nav-link">Catalog</a></li>
+                    <li><a href="{% url 'my_books' %}" class="nav-link">My Shelf</a></li>
+                    {% if user.is_superuser %}
+                    <li><a href="{% url 'publisher_dashboard' %}" class="nav-link">Publisher Portal</a></li>
+                    {% else %}
+                        {% for group in user.groups.all %}
+                            {% if group.name == 'Publisher' %}
+                            <li><a href="{% url 'publisher_dashboard' %}" class="nav-link">Publisher Portal</a></li>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
                     <li><a href="{% url 'logout' %}" class="btn btn-secondary">Sign Out</a></li>
                     {% else %}
                     <li><a href="{% url 'login' %}" class="nav-link">Sign In</a></li>

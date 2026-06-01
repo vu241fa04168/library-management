@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookshelf | Vignan Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .shelf-container {
+        width: 100%;
+        max-width: 1200px;
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+        animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        border-bottom: 1px solid var(--card-border);
+        padding-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .page-title {
+        font-family: var(--font-display);
+        font-size: 2.25rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .shelf-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .shelf-section-title {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .shelf-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+        width: 100%;
+    }
+
+    .record-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius-lg);
+        padding: 1.75rem;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: var(--transition-smooth);
+        min-height: 245px;
+        position: relative;
+    }
+
+    .record-card:hover {
+        border-color: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .record-card.overdue {
+        border-color: rgba(239, 68, 68, 0.4);
+        box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+    }
+
+    .record-card.returned {
+        opacity: 0.75;
+    }
+
+    .book-title {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .book-author {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .record-meta {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        margin-bottom: 1.25rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        padding-top: 0.75rem;
+    }
+
+    .meta-row {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .meta-val {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        width: fit-content;
+        margin-bottom: 1rem;
+    }
+
+    .badge-active {
+        background: rgba(99, 102, 241, 0.15);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        color: #a5b4fc;
+    }
+
+    .badge-returned {
+        background: rgba(16, 185, 129, 0.15);
+        border: 1px solid var(--success-border);
+        color: #34d399;
+    }
+
+    .badge-danger {
+        background: var(--danger-bg);
+        border: 1px solid var(--danger-border);
+        color: #f87171;
+        animation: pulse 2s infinite;
+    }
+
+    .btn-return {
+        width: 100%;
+        text-align: center;
+        padding: 0.7rem;
+        font-size: 0.9rem;
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-return:hover {
+        background: #dc2626;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1.5rem;
+        background: rgba(30, 41, 59, 0.25);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius-lg);
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        width: 100%;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 0.8; }
+        50% { opacity: 1; }
+        100% { opacity: 0.8; }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="shelf-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">My Bookshelf</h1>
+            <p style="color: var(--text-secondary); margin-top: 0.25rem;">Manage your active checkouts and view borrowing history.</p>
+        </div>
+        <div>
+            <a href="{% url 'book_list' %}" class="btn btn-secondary" style="margin-right: 0.5rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 0.25rem;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Catalog
+            </a>
+            {% if is_publisher %}
+            <a href="{% url 'publisher_dashboard' %}" class="btn btn-primary">
+                Publisher Portal
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Active Borrowings Section -->
+    <div class="shelf-section">
+        <h2 class="shelf-section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 0.25rem;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            Active Checkouts
+        </h2>
+        
+        <div class="shelf-grid">
+            {% if active_records %}
+                {% for record in active_records %}
+                    <div class="record-card {% if record.is_overdue %}overdue{% endif %}">
+                        <div>
+                            {% if record.is_overdue %}
+                                <span class="badge badge-danger">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 0.25rem;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                    Overdue
+                                </span>
+                            {% else %}
+                                <span class="badge badge-active">Active Borrowing</span>
+                            {% endif %}
+                            
+                            <div class="book-title">{{ record.book.title }}</div>
+                            <div class="book-author">by {{ record.book.author }}</div>
+                        </div>
+
+                        <div>
+                            <div class="record-meta">
+                                <div class="meta-row">
+                                    <span>Borrowed on:</span>
+                                    <span class="meta-val">{{ record.borrow_date|date:"M d, Y" }}</span>
+                                </div>
+                                <div class="meta-row">
+                                    <span>Due Date:</span>
+                                    <span class="meta-val" {% if record.is_overdue %}style="color: var(--danger)"{% endif %}>
+                                        {{ record.due_date|date:"M d, Y" }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <form action="{% url 'return_book' record.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary btn-return">
+                                    Return Book
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    You do not have any active books borrowed.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- History Section -->
+    <div class="shelf-section" style="margin-top: 1rem;">
+        <h2 class="shelf-section-title" style="color: var(--text-secondary);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 0.25rem;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            Returned History
+        </h2>
+        <div class="shelf-grid">
+            {% if returned_records %}
+                {% for record in returned_records %}
+                    <div class="record-card returned">
+                        <div>
+                            <span class="badge badge-returned">Returned</span>
+                            <div class="book-title">{{ record.book.title }}</div>
+                            <div class="book-author">by {{ record.book.author }}</div>
+                        </div>
+
+                        <div class="record-meta" style="margin-bottom: 0;">
+                            <div class="meta-row">
+                                <span>Borrowed on:</span>
+                                <span class="meta-val">{{ record.borrow_date|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="meta-row">
+                                <span>Returned on:</span>
+                                <span class="meta-val">{{ record.returned_date|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    No checkout history found.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
