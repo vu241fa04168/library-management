@@ -11,6 +11,8 @@ def home_view(request):
     """
     Renders the beautiful user dashboard, only accessible to authenticated users.
     """
+    if request.user.groups.filter(name='Publisher').exists() and not request.user.is_superuser:
+        return redirect('publisher_dashboard')
     return render(request, 'accounts/home.html', {
         'user': request.user
     })
@@ -45,12 +47,17 @@ def login_view(request):
     Handles user login. Redirects to previous page or home upon successful authentication.
     """
     if request.user.is_authenticated:
+        if request.user.groups.filter(name='Publisher').exists() and not request.user.is_superuser:
+            return redirect('publisher_dashboard')
         return redirect('home')
 
     if request.method == 'POST':
         form = UserLoginForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
+            if user.groups.filter(name='Publisher').exists() and not user.is_superuser:
+                messages.error(request, "Access denied. This login portal is restricted to students only. Please use the Publisher Login page.")
+                return render(request, 'accounts/login.html', {'form': form})
             login(request, user)
             messages.success(request, f"Welcome back, {user.username}!")
             next_url = request.GET.get('next', 'home')

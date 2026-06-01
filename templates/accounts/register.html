@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Sign Up | Vignan Portal{% endblock %}
+{% block title %}Sign Up | Vignan Library Portal{% endblock %}
 
 {% block content %}
 <div class="glass-card">
-    <h2 class="card-title">Create Account</h2>
-    <p class="card-subtitle">Get started with a free secure account today</p>
+    <span class="badge-portal">Student Registration</span>
+    <h1 class="card-title">Vignan Library Portal</h1>
+    <p class="card-subtitle">Register to browse books, search the catalog, and track your borrowed shelf.</p>
     
     <form method="post" action="{% url 'register' %}" novalidate id="register-form">
         {% csrf_token %}
